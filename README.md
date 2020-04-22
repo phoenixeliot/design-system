@@ -9,6 +9,7 @@ npm install --save marklogic-ui-library
 
 ## Using the Component Library
 
+- new content
 - Setup your application repo to handle custom Ant Design theming https://ant.design/docs/react/use-with-create-react-app#Advanced-Guides
 - Copy config-overrides.js from /playground into application repo
 - Add Ant Design CSS file to app: '../node_modules/antd/dist/antd.css';
