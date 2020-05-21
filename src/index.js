@@ -10,6 +10,7 @@ import MLCollapse from './MLCollapse'
 import MLConfigProvider from './MLConfigProvider'
 import MLDatePicker from './MLDatePicker'
 import MLDivider from './MLDivider'
+import MLHeader from './MLHeader'
 import * as MLIcon from './MLIcon'
 import MLInputNumber from './MLInputNumber'
 import MLLayout from './MLLayout'
@@ -41,6 +42,7 @@ export {
   MLConfigProvider,
   MLDatePicker,
   MLDivider,
+  MLHeader,
   MLIcon,
   MLInputNumber,
   MLLayout,
