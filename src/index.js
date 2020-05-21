@@ -1,5 +1,6 @@
 import MLAlert from './MLAlert'
 import MLAutoComplete from './MLAutoComplete'
+import MLAvatar from './MLAvatar'
 import MLBreadcrumb from './MLBreadcrumb'
 import MLButton from './MLButton'
 import MLCard from './MLCard'
@@ -37,6 +38,7 @@ import MLUpload from './MLUpload'
 export {
   MLAlert,
   MLAutoComplete,
+  MLAvatar,
   MLBreadcrumb,
   MLButton,
   MLCard,
