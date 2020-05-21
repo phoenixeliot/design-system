@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 
 import {
-  MLHeader,
-  MLTooltip,
   MLButton,
+  MLModal,
   MLDatePicker,
   MLLayout,
   MLSlider,
@@ -11,15 +10,13 @@ import {
 } from '@marklogic/design-system'
 
 import {
-  Route as RouteIcon,
+  Route,
   CheckCircleFilled,
-  SearchOutlined,
-  QuestionCircleOutlined,
-  SettingOutlined,
-  UserOutlined,
 } from '@marklogic/design-system/MLIcon'
-import { text } from '@storybook/addon-knobs'
-import { Avatar as MLAvatar } from 'antd'
+
+import {
+  DraggableModalProvider,
+} from 'ant-design-draggable-modal'
 
 const configValues = {
   dateFormat: 'YYYY-MMM-DD', // Default for all dates, and DatePicker
@@ -29,64 +26,49 @@ const configValues = {
   yearFormat: 'YYYY', // default for Year picker
 }
 
-function makeIcon(icon, title) {
+function useVisible() {
+  const [visible, setVisible] = useState(false)
+  const show = (e) => {
+    setVisible(true)
+  }
+  const hide = (e) => {
+    setVisible(false)
+  }
+  return { visible, show, hide }
+}
+
+const App = () => {
+  const { visible, show, hide } = useVisible()
   return (
-    <MLTooltip
-      title={title}
-      placement='bottom'
-      key={title}
-    >
-      <a href={`#${title}`}>
-        {icon}
-      </a>
-    </MLTooltip>
+    <div>
+      <MLButton
+        onClick={show}
+        size='small'
+        type='primary'
+      >
+        Open Modal
+      </MLButton>
+      <DraggableModalProvider>
+        <MLModal
+          visible={visible}
+          cancelText='Cancel'
+          closable
+          okText='OK'
+          okType='primary'
+          onCancel={hide}
+          onOk={hide}
+          title='Basic Modal'
+        >
+          <h3>
+            Contents
+          </h3>
+          <div>
+            Your text here.
+          </div>
+        </MLModal>
+      </DraggableModalProvider>
+    </div>
   )
 }
 
-export default class App extends Component {
-  render() {
-    return (
-      <div>
-        <MLConfigProvider {...configValues}>
-          <MLLayout>
-            <MLLayout.MLHeader style={{ padding: 0, position: 'fixed', zIndex: 1, width: '100%' }}>
-              <MLHeader
-                title={text('title', 'Data Hub Central')}
-                avatar={
-                  <a href='#'>
-                    <MLAvatar
-                      src={text('project avatar url', 'https://www.marklogic.com/wp-content/themes/marklogic-bs4/resources/favicons/favicon-32x32.png')}
-                      style={{ backgroundColor: 'white' }} // Because the given src has transparent background
-                      size={48}
-                    />
-                  </a>
-                }
-                extra={[
-                  makeIcon(<RouteIcon />, 'route'),
-                  <span key='divider' style={{ borderLeft: '1px dashed' }} />,
-                  makeIcon(<SearchOutlined />, 'search'),
-                  makeIcon(<QuestionCircleOutlined />, 'help'),
-                  makeIcon(<SettingOutlined />, 'settings'),
-                  makeIcon(<UserOutlined />, 'user'),
-                ]}
-              />
-            </MLLayout.MLHeader>
-            <MLLayout.MLContent style={{ marginTop: 64 }}>
-              <MLButton type='primary'>Test</MLButton>
-              <MLButton type='highlight'>Test</MLButton>
-              <RouteIcon />
-              <CheckCircleFilled />
-              <div>
-                <MLSlider tooltipPlacement='top' />
-              </div>
-              <MLDatePicker />
-              <div style={{ height: 2000 }}>Some tall content</div>
-            </MLLayout.MLContent>
-            <MLDatePicker picker='week' />
-            <MLLayout.MLFooter year='2019' />
-          </MLLayout>
-        </MLConfigProvider>
-      </div>
-    )
-  }
-}
+export default App
