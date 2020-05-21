@@ -13,6 +13,7 @@ import MLDivider from './MLDivider'
 import MLDropdown from './MLDropdown'
 import MLHeader from './MLHeader'
 import * as MLIcon from './MLIcon'
+import MLInput from './MLInput'
 import MLInputNumber from './MLInputNumber'
 import MLLayout from './MLLayout'
 import MLMentions from './MLMentions'
@@ -24,6 +25,7 @@ import MLProgress from './MLProgress'
 import MLRadio from './MLRadio'
 import MLRate from './MLRate'
 import MLRow from './MLRow'
+import MLSelect from './MLSelect'
 import MLSlider from './MLSlider'
 import MLSpin from './MLSpin'
 import MLSwitch from './MLSwitch'
@@ -48,6 +50,7 @@ export {
   MLDropdown,
   MLHeader,
   MLIcon,
+  MLInput,
   MLInputNumber,
   MLLayout,
   MLMentions,
@@ -59,6 +62,7 @@ export {
   MLRadio,
   MLRate,
   MLRow,
+  MLSelect,
   MLSlider,
   MLSpin,
   MLSwitch,
