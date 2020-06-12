@@ -15,10 +15,11 @@ import MLDropdown from './MLDropdown'
 import MLEditableSlider from './MLEditableSlider'
 import MLEmpty from './MLEmpty'
 import MLHeader from './MLHeader'
-import * as MLIcon from './MLIcon'
+import MLIcon from './MLIcon'
 import MLInput from './MLInput'
 import MLInputNumber from './MLInputNumber'
 import MLLayout from './MLLayout'
+import MLList from './MLList'
 import MLMentions from './MLMentions'
 import MLMenu from './MLMenu'
 import MLModal from './MLModal'
@@ -32,6 +33,7 @@ import MLRow from './MLRow'
 import MLSelect from './MLSelect'
 import MLSlider from './MLSlider'
 import MLSpin from './MLSpin'
+import MLStatistic from './MLStatistic'
 import MLSwitch from './MLSwitch'
 import MLTable from './MLTable'
 import MLTag from './MLTag'
@@ -60,6 +62,7 @@ export {
   MLInput,
   MLInputNumber,
   MLLayout,
+  MLList,
   MLMentions,
   MLMenu,
   MLModal,
@@ -73,6 +76,7 @@ export {
   MLSelect,
   MLSlider,
   MLSpin,
+  MLStatistic,
   MLSwitch,
   MLTable,
   MLTag,
