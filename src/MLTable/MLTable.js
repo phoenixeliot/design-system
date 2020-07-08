@@ -6,6 +6,7 @@ import { DownOutlined, RightOutlined } from '../MLIcon'
 import classNames from 'classnames'
 import { MLTableContextProvider } from '../MLConfigProvider/MLTableContext'
 import isFunction from 'lodash-es/isFunction'
+import cloneDeep from "lodash-es/cloneDeep";
 
 /**
  * Component for showing an un-expanded nested table, which is just a vertical list of column headers.
@@ -432,11 +433,15 @@ class MLTable extends React.Component {
 
   restructureColumns(columns) {
     const thisWidget = this
-    // const restructuredColumns = clone(columns)
-    const restructuredColumns = columns
+    const restructuredColumns = cloneDeep(columns) // TODO: Find another way! cloneDeep causes bad performance problems
+    // const restructuredColumns = clone(columns).map((col) => {
+    //   const newCol = Object.assign({}, col)
+    //   newCol.children = clone(col.children)
+    // })
+
     for (const column of restructuredColumns) {
-      // const originalColumn = clone(column)
-      const originalColumn = column
+      const originalColumn = clone(column)
+      originalColumn.children = clone(column.children)
       // if (column.children === undefined) {
       //   column.render = (value) => {
       //     return {
@@ -469,9 +474,10 @@ class MLTable extends React.Component {
           console.log('xxxRendering sub-MLTable with columns:', originalColumn.children, column.children)
           console.log('xxxand dataSource:', record[originalColumn.dataIndex], record[column.dataIndex])
           console.log(thisWidget)
-          if (!record[originalColumn.dataIndex]) {
+          if (!record[originalColumn.dataIndex]) { // I don't know why this case ever happens
             return {
               children: value,
+              // children: 'weird_'+originalColumn.dataIndex + value,
               colSpan: 0,
             }
           }
@@ -482,7 +488,7 @@ class MLTable extends React.Component {
                 key={`${column.dataIndex} ${record.key}`}
                 showHeader={false}
                 dataSource={record[originalColumn.dataIndex] || record} // Record is automatically zoomed-in by Ant's table logic
-                columns={originalColumn.children}
+                columns={column.children}
               />
             ),
             props: {
@@ -491,19 +497,43 @@ class MLTable extends React.Component {
             },
           }
         }
+        // TODO: This doesn't handle hiding the outermost layer's excess body cells with colSpan=0. Fix this.
+        // TODO: .slice(1) isn't correct if there's un-split columns after this one. Fix this.
         for (const child of column.children.slice(1)) {
           child.render = (value, record, index) => {
-            console.log(column, child, value, record, index)
-            debugger;
-            return (
-              {
+            if (value === undefined) {
+              return {
                 props: {
                   colSpan: 0,
+                }
+              }
+            }
+            return (
+              {
+                children: value,
+                // children: 'child_'+child.dataIndex + value,
+                props: {
+                  colSpan: 1,
                 },
               }
             )
           }
         }
+        // for (const child of originalColumn.children.slice(1)) {
+        //   child.render = (value, record, index) => {
+        //     console.log(column, child, value, record, index)
+        //     debugger;
+        //     return (
+        //       {
+        //         // children: value,
+        //         children: 'orig_child_'+child.dataIndex + value,
+        //         props: {
+        //           colSpan: 1,
+        //         },
+        //       }
+        //     )
+        //   }
+        // }
       }
     }
     return restructuredColumns
