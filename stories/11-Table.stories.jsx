@@ -287,3 +287,160 @@ export const treeData = () => {
     </div>
   )
 }
+
+export const structuredTableContent = () => {
+  const props = {
+    dataSource: [
+      {
+        first_name: 'Jane',
+        last_name: 'Doe',
+        key: 'Jane',
+        work: [
+          {
+            key: 1234,
+            emp_no: 1234,
+            dept_no: '14PD5',
+            titles: [
+              {
+                key: 't1',
+                title: 'Title 1',
+                from: '15-Jan-2019',
+                to: '15-Jan-2020',
+              },
+              {
+                key: 't2',
+                title: 'Title 2',
+                from: '15-Jan-2019',
+                to: '15-Jan-2020',
+              },
+            ],
+          },
+          {
+            key: 8516,
+            emp_no: 8516,
+            dept_no: '12-DEP',
+            titles: [
+              {
+                key: 't3',
+                title: 'Title 3',
+                from: '15-Jan-2019',
+                to: '15-Jan-2020',
+              },
+              {
+                key: 't4',
+                title: 'Title 4',
+                from: '15-Jan-2019',
+                to: '15-Jan-2020',
+              },
+              {
+                key: 't6',
+                title: 'Title 6',
+                from: '15-Jan-2019',
+                to: '15-Jan-2020',
+              },
+            ],
+          },
+        ],
+        salary_history: [
+          {
+            key: 's1',
+            salary: '$67000',
+          },
+          {
+            key: 's2',
+            salary: '$72,500',
+          },
+          {
+            key: 's3',
+            salary: '$81,750', // TODO: Add support for array of values with no special table formatting
+          },
+        ],
+      },
+    ],
+    columns: [
+      {
+        title: 'First Name',
+        dataIndex: 'first_name',
+        key: 'first_name',
+      },
+      {
+        title: 'Last Name',
+        dataIndex: 'last_name',
+        key: 'last_name',
+      },
+      {
+        title: 'Work',
+        dataIndex: 'work',
+        key: 'work',
+        children: [
+          {
+            title: 'EmpNo',
+            dataIndex: 'emp_no',
+            key: 'emp_no',
+            // colSpan: 3,
+            // render: (text, record, index) => {
+            //   return (
+            //     <MLTable
+            //       bordered={true}
+            //       showHeader={false}
+            //       columns={[{
+            //         title: 'EmpNo',
+            //         dataIndex: 'emp_no',
+            //       }]}
+            //       dataSource={record.work}
+            //     />
+            //   )
+            // },
+          },
+          {
+            title: 'DeptNo',
+            dataIndex: 'dept_no',
+            key: 'dept_no',
+          },
+          {
+            title: 'Titles',
+            dataIndex: 'titles',
+            key: 'titles',
+            children: [
+              {
+                title: 'Title',
+                dataIndex: 'title',
+                key: 'title',
+                // render: (text, record, index) => {
+                //   return (
+                //     <div>
+                //       {record.work.map((work, i) => (
+                //         <MLTable
+                //           bordered={true}
+                //           showHeader={false}
+                //           columns={[{
+                //             title: 'Title',
+                //             dataIndex: 'title',
+                //           }]}
+                //           dataSource={work.titles}
+                //         />
+                //       ))}
+                //     </div>
+                //   )
+                // },
+              },
+              {
+                title: 'From',
+                dataIndex: 'from',
+                key: 'from',
+              },
+              {
+                title: 'To',
+                dataIndex: 'to',
+                key: 'to',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }
+  return (
+    <MLTable {...props} />
+  )
+}

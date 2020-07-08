@@ -40,7 +40,7 @@ class MLTable extends React.Component {
     super(props)
     this.validateProps(props)
     this.state = {}
-    Object.assign(this.state, this.getInitialColumnExpandedStates())
+    // Object.assign(this.state, this.getInitialColumnExpandedStates())
     if (props.draggableRows) {
       Object.assign(this.state,
         this.getInitialRowOrder(),
@@ -51,6 +51,10 @@ class MLTable extends React.Component {
         },
       )
     }
+    Object.assign(this.state, {
+      restructuredColumns: this.restructureColumns(props.columns),
+    })
+    // debugger;
   }
 
   validateProps(props) {
@@ -71,23 +75,23 @@ class MLTable extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.columns !== this.props.columns) {
-      this.setState(Object.assign(
-        this.getInitialColumnExpandedStates(),
-      ))
-    }
-    if (this.props.draggableRows && (!prevState.rowOrder || prevProps.dataSource !== this.props.dataSource)) {
-      this.setState(Object.assign(
-        this.getInitialRowOrder(),
-      ))
-      // This rule is OK to ignore because of the above if statement.
-      // But, consider using one of the alternatives here instead for new best practices:
-      // https://reactjs.org/docs/react-component.html#static-getderivedstatefromprops
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState(this.getInitialColumnExpandedStates())
-    }
-  }
+  // componentDidUpdate(prevProps, prevState, snapshot) {
+  //   if (prevProps.columns !== this.props.columns) {
+  //     this.setState(Object.assign(
+  //       this.getInitialColumnExpandedStates(),
+  //     ))
+  //   }
+  //   if (this.props.draggableRows && (!prevState.rowOrder || prevProps.dataSource !== this.props.dataSource)) {
+  //     this.setState(Object.assign(
+  //       this.getInitialRowOrder(),
+  //     ))
+  //     // This rule is OK to ignore because of the above if statement.
+  //     // But, consider using one of the alternatives here instead for new best practices:
+  //     // https://reactjs.org/docs/react-component.html#static-getderivedstatefromprops
+  //     // eslint-disable-next-line react/no-did-update-set-state
+  //     this.setState(this.getInitialColumnExpandedStates())
+  //   }
+  // }
 
   getInitialColumnExpandedStates() {
     return {
@@ -164,6 +168,59 @@ class MLTable extends React.Component {
       }
       return restructuredRow
     })
+    // Add extra empty row-bits to pad out for multi-row cells
+    const flattenData = (data) => {
+      // Singular datum
+      // debugger
+      if (!Array.isArray(data) && typeof data !== 'object') {
+        return data
+      }
+      // Array of rows
+      if (Array.isArray(data)) {
+        const rows = data
+        const flatRow = {}
+        for (const row of rows) {
+          for (const [key, value] of Object.entries(row)) {
+            const flatValue = flattenData(value)
+            debugger
+            if (typeof data === 'object') {
+              debugger
+            } else {
+              flatRow[key] = flatValue
+            }
+            debugger
+            console.log()
+            // can we recurse here?
+          }
+        }
+      } else if (typeof data === 'object') {
+        debugger
+      }
+      // return restructuredData.map((row) => {
+      //   const flatRow = {}
+      //   for (let [key, value] of Object.entries(row)) {
+      //     if (!Array.isArray(value) && typeof value === 'object' && value !== null) {
+      //       // recurse
+      //       debugger
+      //       // value = flattenData(value)
+      //     } else if (Array.isArray(value)) {
+      //       if (flatRow[key] === undefined) {
+      //         flatRow[key] = []
+      //       }
+      //       const flatValue = flattenData(value)
+      //       flatRow[key].push(value)
+      //       debugger
+      //     } else {
+      //       flatRow[key] = value
+      //       debugger
+      //     }
+      //   }
+      //   return flatRow
+      // })
+    }
+
+    // const flatData = restructuredData.map(flattenData)
+    // debugger
     return restructuredData
   }
 
@@ -252,44 +309,75 @@ class MLTable extends React.Component {
     return rowHandlers
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    Object.entries(this.props).forEach(([key, val]) =>
+      prevProps[key] !== val && console.log(`Prop '${key}' changed`),
+    )
+    if (this.state) {
+      Object.entries(this.state).forEach(([key, val]) =>
+        prevState[key] !== val && console.log(`State '${key}' changed`),
+      )
+    }
+    debugger
+  }
+
   render() {
+    // debugger
     const { showBody, dataSource, columns } = this.props
     if (!showBody) {
       return <MLHeaderTable columns={columns} />
     }
-    const restructuredColumns = columns.map((originalColumn) => {
-      const restructuredColumn = clone(originalColumn)
-      if (originalColumn.columns !== undefined) {
-        if (originalColumn.dataIndex === undefined) {
-          throw Error('dataIndex must be specified when nesting columns')
-        }
-        // If the column has sub-columns, add a toggle to the header
-        restructuredColumn.onHeaderCell = (column) => {
-          const originalOnHeaderCell = (originalColumn.onHeaderCell && originalColumn.onHeaderCell(originalColumn)) || {}
-          // noinspection JSValidateTypes
-          return merge(
-            {
-              style: { cursor: 'pointer' },
-              onClick: () => this.toggleColumnExpanded(column),
-            },
-            originalOnHeaderCell,
-          )
-        }
-        // If the column has sub-columns, render a sub-table
-        restructuredColumn.render = (text, record, index) => (
-          <MLTable
-            columns={originalColumn.columns}
-            dataSource={record[originalColumn.dataIndex]}
-            // draggableRows={this.props.draggableRows}
-            showBody={this.state.columnExpandedStates[originalColumn.dataIndex]}
-            defaultShowEmbeddedTableBodies={this.props.defaultShowEmbeddedTableBodies}
-            size={this.props.size}
-            // onChange={(e) => this.handleEmbeddedTableChange(e, restructuredColumn, record)}
-          />
-        )
-      }
-      return restructuredColumn
-    })
+    // const addMultiRowRender = (originalColumn) => {
+    //   const column = clone(originalColumn)
+    //   if (column.children !== undefined) {
+    //     column.children = clone(originalColumn.children).map(addMultiRowRender)
+    //   } else {
+    //     column.render = (text, record, index) => {
+    //       console.log(originalColumn, column)
+    //       debugger
+    //     }
+    //   }
+    //   return column
+    // }
+    // const restructuredColumns = columns// .map(addMultiRowRender)
+    // const restructuredColumns = this.restructuredColumns;
+    // const restructuredColumns = columns.map((originalColumn) => {
+    //   const restructuredColumn = clone(originalColumn)
+    //   if (originalColumn.children !== undefined) {
+    //     // if (originalColumn.dataIndex === undefined) {
+    //     //   throw Error('dataIndex must be specified when nesting columns')
+    //     // }
+    //     // If the column has sub-columns, add a toggle to the header
+    //     // restructuredColumn.onHeaderCell = (column) => {
+    //     //   const originalOnHeaderCell = (originalColumn.onHeaderCell && originalColumn.onHeaderCell(originalColumn)) || {}
+    //     //   // noinspection JSValidateTypes
+    //     //   return merge(
+    //     //     {
+    //     //       style: { cursor: 'pointer' },
+    //     //       onClick: () => this.toggleColumnExpanded(column),
+    //     //     },
+    //     //     originalOnHeaderCell,
+    //     //   )
+    //     // }
+    //     // If the column has sub-columns, render a sub-table
+    //     restructuredColumn.render = (text, record, index) => (
+    //       <MLTable
+    //         columns={originalColumn.children}
+    //         dataSource={record[]}
+    //       />
+    //       // <MLTable
+    //       //   columns={originalColumn.columns}
+    //       //   dataSource={record[originalColumn.dataIndex]}
+    //       //   // draggableRows={this.props.draggableRows}
+    //       //   showBody={this.state.columnExpandedStates[originalColumn.dataIndex]}
+    //       //   defaultShowEmbeddedTableBodies={this.props.defaultShowEmbeddedTableBodies}
+    //       //   size={this.props.size}
+    //       //   // onChange={(e) => this.handleEmbeddedTableChange(e, restructuredColumn, record)}
+    //       // />
+    //     )
+    //   }
+    //   return restructuredColumn
+    // })
 
     const restructuredData = this.reorderData(this.restructureData(dataSource))
 
@@ -329,7 +417,7 @@ class MLTable extends React.Component {
           }}
           expandIcon={restructuredExpandIcon}
           dataSource={restructuredData} // But force the dataSource and columns to be our modified versions
-          columns={restructuredColumns}
+          columns={this.state.restructuredColumns}
           className={classNames('ml-table', this.props.className)}
           onRow={(record, rowIndex) => {
             return Object.assign(
@@ -341,11 +429,91 @@ class MLTable extends React.Component {
       </MLTableContextProvider>
     )
   }
+
+  restructureColumns(columns) {
+    const thisWidget = this
+    // const restructuredColumns = clone(columns)
+    const restructuredColumns = columns
+    for (const column of restructuredColumns) {
+      // const originalColumn = clone(column)
+      const originalColumn = column
+      // if (column.children === undefined) {
+      //   column.render = (value) => {
+      //     return {
+      //       children: value,
+      //       props: {
+      //         colSpan: 1,
+      //         rowSpan: 1,
+      //       },
+      //     }
+      //   }
+      // }
+      if (column.children !== undefined) {
+        // column.children = clone(column.children)
+        // column.children[0].colSpan = column.children.length
+        column.children[0].render = (value, record, index) => {
+          const countColSpan = (columns) => {
+            // return 1
+            let colSpan = 0
+            for (const column of columns) {
+              if (column.children === undefined) {
+                colSpan += 1
+              } else {
+                colSpan += countColSpan(column.children)
+              }
+            }
+            return colSpan
+          }
+          console.log('xxxCurrent column:', originalColumn, column)
+          console.log('xxxCurrent record:', record)
+          console.log('xxxRendering sub-MLTable with columns:', originalColumn.children, column.children)
+          console.log('xxxand dataSource:', record[originalColumn.dataIndex], record[column.dataIndex])
+          console.log(thisWidget)
+          if (!record[originalColumn.dataIndex]) {
+            return {
+              children: value,
+              colSpan: 0,
+            }
+          }
+          return {
+            children: (
+              // <div>fuck off</div>
+              <MLTable
+                key={`${column.dataIndex} ${record.key}`}
+                showHeader={false}
+                dataSource={record[originalColumn.dataIndex] || record} // Record is automatically zoomed-in by Ant's table logic
+                columns={originalColumn.children}
+              />
+            ),
+            props: {
+              colSpan: countColSpan([originalColumn]),
+              rowSpan: 1,
+            },
+          }
+        }
+        for (const child of column.children.slice(1)) {
+          child.render = (value, record, index) => {
+            console.log(column, child, value, record, index)
+            debugger;
+            return (
+              {
+                props: {
+                  colSpan: 0,
+                },
+              }
+            )
+          }
+        }
+      }
+    }
+    return restructuredColumns
+  }
 }
 
 MLTable.defaultProps = {
   size: 'middle',
   showBody: true,
+  bordered: true,
   onChange: () => {},
   rowKey: undefined,
   defaultShowEmbeddedTableBodies: false,
